@@ -1,103 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management Game</title>
+    <title>لعبة الضغط على الهدف</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #00c6ff, #0072ff);
+            overflow: hidden;
         }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
+        .game-container {
             text-align: center;
-        }
-        h2 {
-            margin-bottom: 20px;
-        }
-        .game-area {
-            margin: 20px 0;
-            padding: 20px;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-        }
-        .game-button {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
             color: white;
-            font-weight: bold;
+        }
+        .target {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
             cursor: pointer;
+            transition: transform 0.1s;
         }
-        .game-button:hover {
-            background-color: #0056b3;
+        .target:active {
+            transform: scale(1.2);
         }
-        .message {
-            margin: 20px 0;
-            font-size: 18px;
-            font-weight: bold;
+        #timer {
+            font-size: 1.5em;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>User Management Game</h2>
-        <div class="game-area">
-            <button class="game-button" onclick="addUser()">Add User</button>
-            <button class="game-button" onclick="updateUser()">Update User</button>
-            <button class="game-button" onclick="deleteUser()">Delete User</button>
-        </div>
-        <div class="message" id="message"></div>
+    <div class="game-container">
+        <h1>اضغط على الهدف بأسرع ما يمكن!</h1>
+        <p id="score">النتيجة: 0</p>
+        <p id="timer">الوقت المتبقي: 30 ثانية</p>
     </div>
 
+    <div class="target" id="target"></div>
+
     <script>
-        function addUser() {
-            const name = prompt("Enter the user's name:");
-            const email = prompt("Enter the user's email:");
-            const birthdate = prompt("Enter the user's birthdate (YYYY-MM-DD):");
+        let score = 0;
+        let timeLeft = 30;
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
 
-            if (name && email && birthdate) {
-                document.getElementById('message').innerText = `User ${name} added successfully!`;
-            } else {
-                document.getElementById('message').innerText = "Failed to add user. Please provide valid data.";
+        function moveTarget() {
+            const maxX = window.innerWidth - target.offsetWidth;
+            const maxY = window.innerHeight - target.offsetHeight;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            target.style.left = `${randomX}px`;
+            target.style.top = `${randomY}px`;
+        }
+
+        target.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = `النتيجة: ${score}`;
+            moveTarget();
+        });
+
+        function updateTimer() {
+            timeLeft--;
+            timerDisplay.textContent = `الوقت المتبقي: ${timeLeft} ثانية`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                target.remove();
+                alert(`انتهى الوقت! نتيجتك النهائية: ${score}`);
             }
         }
 
-        function updateUser() {
-            const email = prompt("Enter the user's email to update:");
-            const newName = prompt("Enter the new name:");
-
-            if (email && newName) {
-                document.getElementById('message').innerText = `User with email ${email} updated to ${newName} successfully!`;
-            } else {
-                document.getElementById('message').innerText = "Failed to update user. Please provide valid data.";
-            }
-        }
-
-        function deleteUser() {
-            const email = prompt("Enter the user's email to delete:");
-
-            if (email) {
-                document.getElementById('message').innerText = `User with email ${email} deleted successfully!`;
-            } else {
-                document.getElementById('message').innerText = "Failed to delete user. Please provide a valid email.";
-            }
-        }
+        const timerInterval = setInterval(updateTimer, 1000);
+        moveTarget();
     </script>
 </body>
 </html>
